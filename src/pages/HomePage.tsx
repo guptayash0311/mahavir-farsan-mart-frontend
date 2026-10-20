@@ -1,66 +1,64 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-import { getHealth, type HealthResponse } from "../api/client";
-
-type LoadState =
-  | { kind: "loading" }
-  | { kind: "ready"; health: HealthResponse }
-  | { kind: "error"; message: string };
+import { api } from "../api/http";
+import type { HomePageData } from "../api/types";
+import { SectionView } from "../components/sections";
+import { Notice, usePageMeta } from "../components/ui";
 
 export function HomePage() {
-  const [state, setState] = useState<LoadState>({ kind: "loading" });
+  const [state, setState] = useState<"loading" | "empty" | "error" | "ready">("loading");
+  const [message, setMessage] = useState("");
+  const [page, setPage] = useState<HomePageData | null>(null);
+  usePageMeta("Mahavir Farsan Mart", "Fresh farsan, sweets, and festival specials from Mahavir Farsan Mart.");
 
   useEffect(() => {
     let cancelled = false;
-    getHealth()
-      .then((health) => {
+    api<HomePageData>("/api/v1/pages/home", { auth: false })
+      .then((data) => {
         if (!cancelled) {
-          setState({ kind: "ready", health });
+          setPage(data);
+          setState("ready");
         }
       })
       .catch((error: unknown) => {
-        if (!cancelled) {
-          const message = error instanceof Error ? error.message : "Unable to reach the API";
-          setState({ kind: "error", message });
+        if (cancelled) {
+          return;
         }
+        const text = error instanceof Error ? error.message : "Unable to load the homepage";
+        if (text.toLowerCase().includes("not found")) {
+          setState("empty");
+          return;
+        }
+        setMessage(text);
+        setState("error");
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
+  if (state === "loading") {
+    return <Notice kind="loading" message="Loading the homepage…" />;
+  }
+  if (state === "error") {
+    return <Notice kind="error" message={message} />;
+  }
+  if (state === "empty" || !page) {
+    return <Notice kind="empty" message="The homepage has not been published yet." />;
+  }
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-900">
-      <div className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-16">
-        <p className="text-sm font-medium tracking-wide text-amber-800">Mahavir Farsan Mart</p>
-        <h1 className="mt-2 text-3xl font-semibold">Platform status</h1>
-        <p className="mt-2 text-stone-600">Customer site and admin will live in this app.</p>
-        <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          {state.kind === "loading" && <p>Checking the API…</p>}
-          {state.kind === "error" && (
-            <div>
-              <p className="font-medium text-red-700">API unreachable</p>
-              <p className="mt-2 text-sm text-stone-600">{state.message}</p>
-            </div>
-          )}
-          {state.kind === "ready" && (
-            <dl className="space-y-3 text-sm">
-              <div className="flex justify-between gap-4">
-                <dt className="text-stone-500">Status</dt>
-                <dd className="font-medium">{state.health.status}</dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-stone-500">Database</dt>
-                <dd className="font-medium">{state.health.database}</dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-stone-500">Version</dt>
-                <dd className="font-medium">{state.health.version}</dd>
-              </div>
-            </dl>
-          )}
-        </section>
-      </div>
-    </main>
+    <div className="space-y-10">
+      {page.active_campaign ? (
+        <Link to={`/campaigns/${page.active_campaign.slug}`} className="block rounded-2xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm text-amber-800">Now on</p>
+          <p className="text-xl font-semibold">{page.active_campaign.name}</p>
+          <p className="text-stone-600">{page.active_campaign.description}</p>
+        </Link>
+      ) : null}
+      {page.sections.map((section) => (
+        <SectionView key={section.id} section={section} />
+      ))}
+    </div>
   );
 }
