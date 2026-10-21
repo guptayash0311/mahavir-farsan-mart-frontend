@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { api } from "../api/http";
-import type { HomePageData } from "../api/types";
-import { SectionView } from "../components/sections";
-import { Notice, usePageMeta } from "../components/ui";
+import { api } from "../../shared/api/http";
+import type { HomePageData } from "../../shared/api/types";
+import { Notice, usePageMeta } from "../../shared/ui";
+import { SectionView } from "./sections";
 
 export function HomePage() {
   const [state, setState] = useState<"loading" | "empty" | "error" | "ready">("loading");
@@ -50,10 +50,10 @@ export function HomePage() {
   return (
     <div className="space-y-10">
       {page.active_campaign ? (
-        <Link to={`/campaigns/${page.active_campaign.slug}`} className="block rounded-2xl border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm text-amber-800">Now on</p>
+        <Link to={`/campaigns/${page.active_campaign.slug}`} className="block rounded-2xl border border-marigold bg-white p-4">
+          <p className="text-sm text-saffron-deep">Now on</p>
           <p className="text-xl font-semibold">{page.active_campaign.name}</p>
-          <p className="text-stone-600">{page.active_campaign.description}</p>
+          <p className="text-ink/70">{page.active_campaign.description}</p>
         </Link>
       ) : null}
       {page.sections.map((section) => (

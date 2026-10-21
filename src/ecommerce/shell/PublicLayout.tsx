@@ -1,17 +1,17 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 
-import { useSession } from "../auth/session";
+import { useSession } from "../../shared/auth/session";
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  isActive ? "text-amber-800" : "text-stone-700 hover:text-amber-800";
+  isActive ? "font-medium text-marigold" : "text-cream/90 hover:text-marigold";
 
 export function PublicLayout() {
   const { user, logout } = useSession();
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900">
-      <header className="border-b border-stone-200 bg-white">
+    <div className="min-h-screen bg-cream text-ink">
+      <header className="border-b border-marigold/70 bg-saffron-deep text-cream">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <Link to="/" className="text-lg font-semibold text-amber-900">
+          <Link to="/" className="text-lg font-semibold text-marigold">
             Mahavir Farsan Mart
           </Link>
           <nav className="flex flex-wrap gap-4 text-sm">
@@ -41,7 +41,7 @@ export function PublicLayout() {
                 <NavLink to="/account" className={linkClass}>
                   Account
                 </NavLink>
-                <button className="text-stone-700" onClick={() => void logout()}>
+                <button className="text-cream/90" onClick={() => void logout()}>
                   Sign out
                 </button>
               </>

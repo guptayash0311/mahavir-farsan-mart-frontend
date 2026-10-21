@@ -1,9 +1,9 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { api } from "../api/http";
-import { useSession } from "../auth/session";
-import { Notice, Panel, buttonClass, inputClass, usePageMeta } from "../components/ui";
+import { api } from "../../shared/api/http";
+import { useSession } from "../../shared/auth/session";
+import { Panel, buttonClass, inputClass, usePageMeta } from "../../shared/ui";
 
 export function LoginPage({ admin = false }: { admin?: boolean }) {
   const { login } = useSession();
@@ -29,7 +29,7 @@ export function LoginPage({ admin = false }: { admin?: boolean }) {
         <button className={buttonClass}>Sign in</button>
       </form>
       {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
-      {admin ? null : <p className="mt-4 text-sm"><Link to="/register">Create an account</Link> · <Link to="/forgot-password">Forgot password</Link></p>}
+      {admin ? null : <p className="mt-4 text-sm"><Link className="text-saffron-deep" to="/register">Create an account</Link> · <Link className="text-saffron-deep" to="/forgot-password">Forgot password</Link></p>}
     </Panel>
   );
 }
@@ -104,30 +104,5 @@ export function ForgotPasswordPage() {
       ) : null}
       {message ? <p className="mt-3 text-sm">{message}</p> : null}
     </Panel>
-  );
-}
-
-export function DocumentsPage() {
-  const [rows, setRows] = useState<{ id: string; title: string; category: string; file_url: string | null }[] | null>(null);
-  const [error, setError] = useState("");
-  usePageMeta("Documents · Mahavir Farsan Mart", "Published licenses and certificates.");
-  useEffect(() => {
-    api<{ id: string; title: string; category: string; file_url: string | null }[]>("/api/v1/documents/public", { auth: false })
-      .then(setRows)
-      .catch((reason: unknown) => setError(reason instanceof Error ? reason.message : "Unable to load documents"));
-  }, []);
-  if (error) return <Notice kind="error" message={error} />;
-  if (!rows) return <Notice kind="loading" message="Loading documents…" />;
-  if (rows.length === 0) return <Notice kind="empty" message="No public documents yet." />;
-  return (
-    <ul className="space-y-3">
-      {rows.map((row) => (
-        <li key={row.id} className="rounded-2xl border border-stone-200 bg-white p-4">
-          <p className="font-medium">{row.title}</p>
-          <p className="text-sm text-stone-500">{row.category}</p>
-          {row.file_url ? <a className="text-sm text-amber-800" href={`${import.meta.env.VITE_API_URL ?? "http://localhost:8000"}${row.file_url}`}>Open</a> : null}
-        </li>
-      ))}
-    </ul>
   );
 }

@@ -1,10 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 
-import { api, mediaUrl } from "../api/http";
-import type { Category, Named, PageResult, ProductCard } from "../api/types";
-import { Notice, usePageMeta } from "../components/ui";
-import { formatInr } from "../lib/format";
+import { api, mediaUrl } from "../../shared/api/http";
+import type { Category, Named, PageResult, ProductCard } from "../../shared/api/types";
+import { formatInr } from "../../shared/format";
+import { Notice, buttonClass, quietButton, usePageMeta } from "../../shared/ui";
 
 type ProductDetail = ProductCard & {
   description: string;
@@ -23,10 +23,10 @@ function ProductGrid({ products }: { products: ProductCard[] }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {products.map((product) => (
-        <Link key={product.id} to={`/products/${product.slug}`} className="rounded-2xl border border-stone-200 bg-white p-4">
+        <Link key={product.id} to={`/products/${product.slug}`} className="rounded-2xl border border-marigold/50 bg-white p-4">
           {product.image_url ? <img alt="" src={mediaUrl(product.image_url) ?? ""} className="mb-3 h-36 w-full rounded-xl object-cover" /> : null}
           <p className="font-medium">{product.name}</p>
-          <p className="text-sm text-amber-800">{formatInr(product.price)}</p>
+          <p className="text-sm text-saffron-deep">{formatInr(product.price)}</p>
         </Link>
       ))}
     </div>
@@ -46,7 +46,7 @@ export function CategoriesPage() {
   return (
     <div className="flex flex-wrap gap-3">
       {rows.map((row) => (
-        <Link key={row.id} to={`/categories/${row.slug}`} className="rounded-full border border-stone-300 bg-white px-4 py-2">
+        <Link key={row.id} to={`/categories/${row.slug}`} className="rounded-full border border-saffron/40 bg-white px-4 py-2">
           {row.name}
         </Link>
       ))}
@@ -108,8 +108,8 @@ export function SearchPage() {
     <div>
       <h1 className="text-3xl font-semibold">Search</h1>
       <form onSubmit={onSubmit} className="mt-4 flex gap-2">
-        <input name="q" defaultValue={q} className="w-full rounded-lg border border-stone-300 px-3 py-2" placeholder="Search products" />
-        <button className="rounded-lg bg-amber-800 px-4 py-2 text-white">Search</button>
+        <input name="q" defaultValue={q} className="w-full rounded-lg border border-saffron/40 bg-white px-3 py-2" placeholder="Search products" />
+        <button className={buttonClass}>Search</button>
       </form>
       <div className="mt-6">
         {error ? <Notice kind="error" message={error} /> : null}
@@ -145,26 +145,26 @@ export function ProductPage() {
   return (
     <article className="grid gap-8 md:grid-cols-2">
       <div>
-        {product.media[0] ? <img alt="" src={mediaUrl(product.media[0].url) ?? ""} className="w-full rounded-2xl object-cover" /> : <div className="flex h-64 items-center justify-center rounded-2xl bg-stone-200">No image</div>}
+        {product.media[0] ? <img alt="" src={mediaUrl(product.media[0].url) ?? ""} className="w-full rounded-2xl object-cover" /> : <div className="flex h-64 items-center justify-center rounded-2xl bg-marigold/30">No image</div>}
       </div>
       <div>
         <h1 className="text-3xl font-semibold">{product.name}</h1>
-        <p className="mt-2 text-xl text-amber-800">{formatInr(product.price)}</p>
-        {product.mrp ? <p className="text-sm text-stone-500">MRP {formatInr(product.mrp)}</p> : null}
-        <p className="mt-4 text-stone-700">{product.description}</p>
+        <p className="mt-2 text-xl text-saffron-deep">{formatInr(product.price)}</p>
+        {product.mrp ? <p className="text-sm text-ink/60">MRP {formatInr(product.mrp)}</p> : null}
+        <p className="mt-4 text-ink/80">{product.description}</p>
         <dl className="mt-4 space-y-1 text-sm">
           {product.attributes.map((row) => (
             <div key={row.id} className="flex justify-between gap-4">
-              <dt className="text-stone-500">{row.name}</dt>
+              <dt className="text-ink/60">{row.name}</dt>
               <dd>{row.value}</dd>
             </div>
           ))}
         </dl>
         <div className="mt-6 flex gap-3">
-          <button className="rounded-lg bg-amber-800 px-4 py-2 text-white" onClick={() => void add("/api/v1/cart/items")}>
+          <button className={buttonClass} onClick={() => void add("/api/v1/cart/items")}>
             Add to cart
           </button>
-          <button className="rounded-lg border border-stone-300 px-4 py-2" onClick={() => void add("/api/v1/wishlist/items")}>
+          <button className={quietButton} onClick={() => void add("/api/v1/wishlist/items")}>
             Save
           </button>
         </div>
@@ -189,7 +189,7 @@ export function CampaignPage() {
   return (
     <div>
       <h1 className="text-3xl font-semibold">{campaign.name}</h1>
-      <p className="mt-2 max-w-2xl text-stone-600">{campaign.description}</p>
+      <p className="mt-2 max-w-2xl text-ink/70">{campaign.description}</p>
       <div className="mt-8">
         <ProductGrid products={campaign.products} />
       </div>

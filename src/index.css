@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@theme {
+  --color-saffron: #e07a1f;
+  --color-saffron-deep: #c45c12;
+  --color-marigold: #f5c518;
+  --color-cream: #fff8e7;
+  --color-ink: #3d2914;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
